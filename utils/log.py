@@ -6,18 +6,12 @@ import logging
 import sys
 import platform
 import os
+import utils
 
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 log_path = 'logs'
 log_name = 'saber.log'
 logLevel = 'debug'
-
-def isLinux():
-     if platform.system() == 'Linux':
-          return True
-     else:
-          return False
-
 
 class Log(object):
     def __init__(self):
@@ -29,7 +23,7 @@ class Log(object):
         formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
 
 
-        if isLinux():
+        if utils.isLinux():
            logfile = "%s/%s/%s" %(base_dir,log_path,log_name)
         else:
            logfile = "%s\\%s\\%s" %(base_dir,log_path,log_name)
