@@ -4,7 +4,6 @@ __author__ = 'winkyi@163.com'
 
 import logging
 import sys
-import platform
 import os
 import utils
 

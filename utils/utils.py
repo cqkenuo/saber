@@ -7,9 +7,8 @@ import os
 import platform
 import pika
 import MySQLdb
-
-from log import Log
-logger = Log()
+import log
+logger = log.Log()
 
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 #conf文件夹在工程相对路径下的名字
@@ -70,7 +69,7 @@ class RabbitMQ(object):
 """
 mysql数据库相关
 """
-class MysqlHelper(object):
+class MysqlBase(object):
 
     def __init__(self,ipaddr,username,password,dbname,port):
         self.db = MySQLdb.connect(ipaddr,username,password,dbname,port)
@@ -113,15 +112,40 @@ class MysqlHelper(object):
 
 
 
+class MysqlHelper(object):
+
+    def __init__(self):
+        cf = GetConf("mysql.conf","db")
+        host = cf.get('host')
+        port = cf.getInt('port')
+        username = cf.get('username')
+        password = cf.get('password')
+        dbname = cf.get('dbname')
+        self.obj = MysqlBase(host,username,password,dbname,port)
+
+
+    #查询所有nodes节点的信息
+    def findNodeInfo(self):
+        sql = 'select * from node_info'
+        return self.obj.query_data(sql)
+
+
+
+
+
+
+
 if __name__ == '__main__':
-    #conf配置文件的相关
-    cf = GetConf("rbq.conf","main")
-    ipaddr =  cf.get("host")
-    port =  cf.getInt("port")
-    username = cf.get('username')
-    password = cf.get('password')
-    vhost = cf.get('vhost')
+    # #conf配置文件的相关
+    # cf = GetConf("rbq.conf","main")
+    # ipaddr =  cf.get("host")
+    # port =  cf.getInt("port")
+    # username = cf.get('username')
+    # password = cf.get('password')
+    # vhost = cf.get('vhost')
+    #
+    # mq = RabbitMQ(username,password,ipaddr,port,vhost)
+    # mq.sendMessage('test','okokok')
 
-    mq = RabbitMQ(username,password,ipaddr,port,vhost)
-    mq.sendMessage('test','okokok')
-
+    mh = MysqlHelper()
+    print mh.findNodeInfo()

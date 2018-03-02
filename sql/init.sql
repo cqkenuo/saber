@@ -30,3 +30,28 @@ ALTER TABLE node_server ADD CONSTRAINT server_fk FOREIGN KEY(serverID) REFERENCE
 --删除外键约束
 ALTER TABLE node_server DROP FOREIGN KEY node_fk;
 ALTER TABLE node_server DROP FOREIGN KEY server_fk;
+
+
+----------------------------------
+--时间比较赶，先用以下表结构
+--nodes
+CREATE TABLE node_info(
+id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+nHostname VARCHAR (20) NOT NULL ,
+nIP VARCHAR (20) NOT NULL ,
+isMaster INT (2) NOT NULL DEFAULT 0,
+st TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) DEFAULT CHARSET='utf8';
+
+--param
+CREATE TABLE param(
+id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+pKey VARCHAR (20) NOT NULL ,
+pValue VARCHAR (20) NOT NULL ,
+pRemark VARCHAR (20) NOT NULL DEFAULT '_',
+st TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+)DEFAULT CHARSET='utf8';
+
+INSERT into  param(pKey,pValue,pReamrk) values('','','');
+INSERT INTO  node_info(nHostname,nIP,isMaster) VALUES ('VM_217_177_centos','10.104.217.177',1);
+INSERT INTO  node_info(nHostname,nIP,isMaster) VALUES ('VM_217_177_centos','10.104.217.177',0);
