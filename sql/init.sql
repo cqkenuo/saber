@@ -52,6 +52,8 @@ pRemark VARCHAR (20) NOT NULL DEFAULT '_',
 st TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 )DEFAULT CHARSET='utf8';
 
-INSERT into  param(pKey,pValue,pReamrk) values('','','');
+INSERT into  param(pKey,pValue,pRemark) values('uassPath','tools/cloud/uass','uass服务部署的位置，相对路径');
+INSERT into  param(pKey,pValue,pRemark) values('ssmcPath','tools/cloud/ssmc','uass服务部署的位置，相对路径');
+INSERT into  param(pKey,pValue,pRemark) values('selfPath','tools/cloud/self','uass服务部署的位置，相对路径');
 INSERT INTO  node_info(nHostname,nIP,isMaster) VALUES ('VM_217_177_centos','10.104.217.177',1);
 INSERT INTO  node_info(nHostname,nIP,isMaster) VALUES ('VM_217_177_centos','10.104.217.177',0);

@@ -6,9 +6,7 @@ import ConfigParser
 import os
 import platform
 import pika
-import MySQLdb
-import log
-logger = log.Log()
+import socket
 
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 #conf文件夹在工程相对路径下的名字
@@ -46,7 +44,7 @@ class GetConf(object):
 
 
 """
-消息队列相关
+消息队列生产者相关
 """
 class RabbitMQ(object):
     def __init__(self,username,password,ipaddr,port,vhost):
@@ -66,86 +64,21 @@ class RabbitMQ(object):
         )
 
 
-"""
-mysql数据库相关
-"""
-class MysqlBase(object):
-
-    def __init__(self,ipaddr,username,password,dbname,port):
-        self.db = MySQLdb.connect(ipaddr,username,password,dbname,port)
-        self.cursor = self.db.cursor()
-
-    def __del__(self):
-        self.cursor.close()
-        self.db.close()
-
-    #数据库查询操作
-    def query_data(self,sql):
-        try:
-            self.cursor.execute(sql)
-            result = self.cursor.fectchall()
-            for row in result:
-                print row
-        except:
-            logger.exception("Error: unable to fetch data")
-
-    #数据库插入操作
-    #sql的格式：
-    #insert into table_name(xxxx) values ('%s') %("xxxxx")
-    def insert_data(self,sql):
-        try:
-            self.cursor.execute(sql)
-            self.db.commit()
-            logger.info("insert [%s] sql success!" % sql)
-        except:
-            logger.exception("Error: insert [%sql] fail!" %sql)
-            self.db.rollback()
-
-    def update_data(self,sql):
-        try:
-            self.cursor.execute(sql)
-            self.db.commit()
-            logger.info("update [%s] sql success!" % sql)
-        except:
-            logger.exception("Error: update [%sql] fail!" %sql)
-            self.db.rollback()
+def getHostName():
+    return socket.gethostname()
 
 
-
-class MysqlHelper(object):
-
-    def __init__(self):
-        cf = GetConf("mysql.conf","db")
-        host = cf.get('host')
-        port = cf.getInt('port')
-        username = cf.get('username')
-        password = cf.get('password')
-        dbname = cf.get('dbname')
-        self.obj = MysqlBase(host,username,password,dbname,port)
-
-
-    #查询所有nodes节点的信息
-    def findNodeInfo(self):
-        sql = 'select * from node_info'
-        return self.obj.query_data(sql)
-
-
-
-
-
-
+def getIPAddr():
+    return socket.gethostbyname(getHostName())
 
 if __name__ == '__main__':
-    # #conf配置文件的相关
-    # cf = GetConf("rbq.conf","main")
-    # ipaddr =  cf.get("host")
-    # port =  cf.getInt("port")
-    # username = cf.get('username')
-    # password = cf.get('password')
-    # vhost = cf.get('vhost')
-    #
-    # mq = RabbitMQ(username,password,ipaddr,port,vhost)
-    # mq.sendMessage('test','okokok')
+    #conf配置文件的相关
+    cf = GetConf("rbq.conf","main")
+    ipaddr =  cf.get("host")
+    port =  cf.getInt("port")
+    username = cf.get('username')
+    password = cf.get('password')
+    vhost = cf.get('vhost')
 
-    mh = MysqlHelper()
-    print mh.findNodeInfo()
+    mq = RabbitMQ(username,password,ipaddr,port,vhost)
+    mq.sendMessage('test','okokok')

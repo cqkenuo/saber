@@ -1,0 +1,22 @@
+#参数
+set:
+project xxx xxx xxx
+
+
+{'backup':'redis','update':'redis','versionPath':'xxxxx','projectPath':'xxxxxx','backupPath':'xxxxx'}
+
+
+[hash]
+'versionLib' 'ip' '202.5.20.208'
+'versionLib' 'hostname' 'root'
+'versionLib' 'path' 'tools'
+
+'mysql' 'projectPath'  'tools'
+'mysql' 'backupPath'  'tools/backup'
+'mysql' 'projectName'  'test.war'
+
+'nodes' 'VM_217_177_centos' '10.104.217.177'
+
+
+
+

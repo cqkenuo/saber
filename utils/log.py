@@ -2,6 +2,7 @@
 __time__ = '2018/2/28 14:47'
 __author__ = 'winkyi@163.com'
 
+
 import logging
 import sys
 import os
@@ -10,7 +11,7 @@ import utils
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 log_path = 'logs'
 log_name = 'saber.log'
-logLevel = 'debug'
+logLevel = 'error'
 
 class Log(object):
     def __init__(self):
