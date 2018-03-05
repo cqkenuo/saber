@@ -81,6 +81,7 @@ if __name__ == '__main__':
     r.hset("versionLib",'ip','202.5.20.208')
     r.hset('versionLib','hostname','root')
     r.hset('versionLib','path','tools')
+    r.hset('versionLib','password','tools')
     versionLib_dic = r.hgetall('versionLib')
     print versionLib_dic
 
