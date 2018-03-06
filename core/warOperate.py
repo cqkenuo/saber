@@ -3,8 +3,11 @@ __time__ = '2018/3/2 11:14'
 __author__ = 'winkyi@163.com'
 
 from utils import log
-from utils.utils import GetConf,RabbitMQ
+from utils.utils import GetConf,RabbitMQPublish
 import json
+from utils.encrypt import MyCrypt
+
+ed = MyCrypt()
 
 
 logger = log.Log()
@@ -14,6 +17,8 @@ logger = log.Log()
 def getChannel():
     return 'clond'
 
+def getExchange():
+    return 'cloud'
 
 def sendCMDToSlave(param):
     logger.info('prepare send cmd to slave!')
@@ -21,10 +26,10 @@ def sendCMDToSlave(param):
     ipaddr =  cf.get("host")
     port =  cf.getInt("port")
     username = cf.get('username')
-    password = cf.get('password')
+    password = ed.decrypt(cf.get('password'))
     vhost = cf.get('vhost')
 
-    mq = RabbitMQ(username,password,ipaddr,port,vhost)
-    mq.sendMessage(getChannel(),json.dumps(param))
+    mq = RabbitMQPublish(username,password,ipaddr,port,vhost)
+    mq.sendMessage(getExchange(),json.dumps(param))
 
 
