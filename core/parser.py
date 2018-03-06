@@ -34,27 +34,36 @@ class Saber(object):
             print options.show_status
 
 
+        #判断备份和更新的工程是否一样，强制要求要一样
+        if options.backup_project and  options.update_project:
+            if options.backup_project != options.update_project:
+                logger.error("backup project is no same update! process exit")
+                sys.exit()
 
+        #回退操作必须单独执行
+        if options.restore_project:
+            if options.backup_project or  options.update_project:
+                logger.error("exist restore operate,not allow backup or update operate! process exit")
+                sys.exit()
 
         #如果命令是带-c,-b,-u
         #{'backup':'redis','update':'redis','versionPath':'xxxxx','projectPath':'xxxxxx','backupPath':'xxxxx'}
         if options.backup_project:
             self.operParam['backup'] = options.backup_project
+            project_name = options.backup_project
 
         if options.update_project:
-            self.operParam['update'] = options.backup_project
+            self.operParam['update'] = options.update_project
+            project_name = options.update_project
+
 
         if options.restore_project:
-            self.operParam['restore'] = options.backup_project
+            self.operParam['restore'] = options.restore_project
+            project_name = options.restore_project
 
-
-        #判断备份和更新的工程是否一样，强制要求要一样
-        if options.backup_project != options.update_project:
-            logger.error("backup project is no same update! process exit")
-            sys.exit()
 
         if self.operParam:
-            project_dic = self.redis_cli.hgetall(options.backup_project)
+            project_dic = self.redis_cli.hgetall(project_name)
             nodeParam = dict(self.versionLib_dic, **self.operParam)
             paramInof = dict(nodeParam, **project_dic)
             sendCMDToSlave(paramInof)

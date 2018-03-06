@@ -7,6 +7,7 @@ from utils.utils import GetConf
 import socket
 import json,pika
 from utils.encrypt import MyCrypt
+from core.slaveHandle import SlaveHandle
 
 
 logger = log.Log()
@@ -70,7 +71,8 @@ class Slave(object):
 
 
     def callback(self,ch,method,properties,body):
-        print (" [x] Received %r" % body)
+        sh = SlaveHandle()
+        sh.handle(body)
         logger.info(" [x] Received %r" % body)
 
 

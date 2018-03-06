@@ -7,9 +7,8 @@ from utils.utils import GetConf,RabbitMQPublish
 import json
 from utils.encrypt import MyCrypt
 
+
 ed = MyCrypt()
-
-
 logger = log.Log()
 
 
