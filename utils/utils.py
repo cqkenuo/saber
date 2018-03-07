@@ -8,6 +8,8 @@ import platform
 import pika
 import socket
 from encrypt import MyCrypt
+import tarfile
+import datetime
 
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 #conf文件夹在工程相对路径下的名字
@@ -94,17 +96,81 @@ def getHostName():
 def getIPAddr():
     return socket.gethostbyname(getHostName())
 
+
+#获取当前时间格式为yyyymmddhh24miss
+def getCurrentTime():
+    return datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+
+
+#压缩文件
+def makeTar(sourcePath,targetPath,tarName):
+    tar = tarfile.open('%s/%s_%s.tar.gz' %(targetPath,tarName,getCurrentTime()),'w:gz')
+    for root ,dir,files in os.walk(sourcePath):
+        root_ = os.path.relpath(root,start=sourcePath)
+        for file in files:
+            fullpath = os.path.join(root,file)
+            tar.add(fullpath,arcname=os.path.join(root_,file))
+    tar.close()
+
+#解压文件
+def unTar(sourcePath,tarName,unzipPath):
+    t = tarfile.open("%s/%s" %(sourcePath,tarName))
+    t.extractall(path=unzipPath)
+
+
+
+#判断路径是否存在，如果不存在，创建
+def pathIsExists(path):
+    try:
+        # 去除首位空格
+        path=path.strip()
+        # 去除尾部 \ 符号
+        path=path.rstrip("\\")
+        isExists=os.path.exists(path)
+        if not isExists:
+            os.makedirs(path)
+        return True
+    except:
+        return False
+
+#判断路径是否存在
+def isPath(path):
+    # 去除首位空格
+    path=path.strip()
+    # 去除尾部 \ 符号
+    path=path.rstrip("\\")
+    isExists=os.path.exists(path)
+    if isExists:
+        return True
+    else:
+        return False
+
+
+#获取家目录
+def getHomePath():
+    return os.environ['HOME']
+
+
 if __name__ == '__main__':
-    #conf配置文件的相关
-    cf = GetConf("rbq.conf","main")
-    ipaddr =  cf.get("host")
-    port =  cf.getInt("port")
-    username = cf.get('username')
-    password = cf.get('password')
-    vhost = cf.get('vhost')
+    # #conf配置文件的相关
+    # cf = GetConf("rbq.conf","main")
+    # ipaddr =  cf.get("host")
+    # port =  cf.getInt("port")
+    # username = cf.get('username')
+    # password = cf.get('password')
+    # vhost = cf.get('vhost')
+    #
+    # mq = RabbitMQPublish(username,ed.decrypt(password),ipaddr,port,vhost)
+    # mq.sendMessage('cloud','okokok666')
 
-    # mq = RabbitMQ(username,password,ipaddr,port,vhost)
-    # mq.sendMessage('test','okokok')
+    ##测试解压压缩
+    # makeTar('/home/ap/ldap/software/git-2.9.5','/home/ap/ldap/tools/backup','git')
+    # unTar('/home/ap/ldap/tools/backup','git_20180307092718.tar.gz','/home/ap/ldap/tools/git')
 
-    mq = RabbitMQPublish(username,ed.decrypt(password),ipaddr,port,vhost)
-    mq.sendMessage('cloud','okokok666')
+    #判断路径是否存在，不存在就创建
+    aa = pathIsExists("%s/chenwq222" %getHomePath())
+    print aa
+
+    bb = isPath("tools/apache-tomcat-8.5.24")
+    print bb
+

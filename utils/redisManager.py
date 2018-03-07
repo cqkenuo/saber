@@ -78,17 +78,18 @@ if __name__ == '__main__':
     print pro_set
 
     #初始化版本库信息
-    r.hset("versionLib",'ip','202.5.20.208')
-    r.hset('versionLib','hostname','root')
-    r.hset('versionLib','path','tools')
-    r.hset('versionLib','password','tools')
+    r.hset("versionLib",'versionLib_ip','202.5.20.208')
+    r.hset('versionLib','versionLib_hostname','root')
+    r.hset('versionLib','versionLib_hath','tools')
+    r.hset('versionLib','versionLib_password','c97743691fabf583cdd226ba7d3522f2')
     versionLib_dic = r.hgetall('versionLib')
     print versionLib_dic
 
     #初始化一个应用的基本信息
-    r.hset("mysql",'projectPath','tools')
-    r.hset('mysql','backupPath','tools/backup')
-    r.hset('mysql','projectName','test.war')
+    r.hset("mysql",'project_path','tools/apache-tomcat-8.5.24')  #程序放置路径
+    r.hset('mysql','project_backupPath','tools/backup') #备份路径
+    r.hset('mysql','project_name','test.war') #工程名字
+    r.hset('mysql','project_versionLib','localVersionLib')  #本地版本路径
     mysql_dic = r.hgetall('mysql')
 
     #保存

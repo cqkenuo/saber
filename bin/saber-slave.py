@@ -18,16 +18,14 @@ class Slave(object):
     def __init__(self):
         #注册主机信息到redis
         redis_cli = redisManager.redis_cli()
-        redis_cli.hset("nodes",'hostname',socket.gethostname())
-        redis_cli.hset('nodes','ipaddr',socket.gethostbyname(socket.gethostname()))
+        redis_cli.hset("nodes",'nodesHostname',socket.gethostname())
+        redis_cli.hset('nodes','nodesIpaddr',socket.gethostbyname(socket.gethostname()))
         cf = GetConf("rbq.conf","main")
         self.ipaddr =  cf.get("host")
         self.port =  cf.getInt("port")
         self.username = cf.get('username')
         self.password = ed.decrypt(cf.get('password'))
         self.vhost = cf.get('vhost')
-
-
 
     def getChannel(self):
         return 'clond'

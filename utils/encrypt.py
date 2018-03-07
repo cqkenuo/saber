@@ -35,7 +35,7 @@ class MyCrypt():
 
 if __name__ == '__main__':
     mycrypt = MyCrypt()
-    e = mycrypt.encrypt('saber')
+    e = mycrypt.encrypt('!@cwq8898859')
     d = mycrypt.decrypt(e)
     print e
     print d
