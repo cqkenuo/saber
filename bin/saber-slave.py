@@ -69,13 +69,9 @@ class Slave(object):
 
 
     def callback(self,ch,method,properties,body):
-        sh = SlaveHandle()
-        sh.handle(body)
+        sh = SlaveHandle(body)
+        sh.handle()
         logger.info(" [x] Received %r" % body)
-
-
-
-
 
 if __name__ == '__main__':
     s = Slave()

@@ -10,6 +10,8 @@ import socket
 from encrypt import MyCrypt
 import tarfile
 import datetime
+import shutil
+
 
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 #conf文件夹在工程相对路径下的名字
@@ -102,9 +104,15 @@ def getCurrentTime():
     return datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
 
+
+#获取当天日期
+def getCurrentDay():
+    return datetime.datetime.now().strftime("%Y%m%d")
+
+
 #压缩文件
 def makeTar(sourcePath,targetPath,tarName):
-    tar = tarfile.open('%s/%s_%s.tar.gz' %(targetPath,tarName,getCurrentTime()),'w:gz')
+    tar = tarfile.open('%s/%s.tar.gz' %(targetPath,tarName),'w:gz')
     for root ,dir,files in os.walk(sourcePath):
         root_ = os.path.relpath(root,start=sourcePath)
         for file in files:
@@ -146,10 +154,46 @@ def isPath(path):
         return False
 
 
+#判断文件是否存在
+def fileIsExist(fileName):
+    if os.access(fileName, os.F_OK):
+        return True
+    else:
+        return False
+
+
+
+#获取文件大小
+def getFileSize(fileName):
+    fsize = os.path.getsize(fileName)
+    return fsize
+
+
+
 #获取家目录
 def getHomePath():
     return os.environ['HOME']
 
+
+#删除文件夹
+def delDir(delDir):
+    delList = os.listdir(delDir)
+    for f in delList:
+        filePath = os.path.join(delDir, f )
+        if os.path.isfile(filePath):
+            os.remove(filePath)
+            print filePath + " was removed!"
+        elif os.path.isdir(filePath):
+            shutil.rmtree(filePath,True)
+            print "Directory: " + filePath +" was removed!"
+
+
+#判断文件夹是否为空
+def isNullDir(work_path):
+    if not os.listdir(work_path):
+        return True
+    else:
+        return False
 
 if __name__ == '__main__':
     # #conf配置文件的相关
@@ -173,4 +217,18 @@ if __name__ == '__main__':
 
     bb = isPath("tools/apache-tomcat-8.5.24")
     print bb
+
+    #判断文件是否存在
+    cc = fileIsExist("/home/ap/ldap/1.log")
+    print cc
+
+
+    #获取文件大小
+    print getFileSize("/home/ap/ldap/tools/backup/test_20180307150838.tar.gz")
+
+    #删除文件夹
+    # delDir("/home/ap/ldap/tools/apache-tomcat-8.5.24")
+
+    #文件夹是否为空
+    print isNullDir("/home/ap/ldap/tools/apache-tomcat-8.5.24")
 

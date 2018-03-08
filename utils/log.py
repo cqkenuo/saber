@@ -11,7 +11,7 @@ import utils
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 log_path = 'logs'
 log_name = 'saber.log'
-logLevel = 'error'
+logLevel = 'info'
 
 class Log(object):
     def __init__(self):
