@@ -21,12 +21,12 @@ def getExchange():
 
 def sendCMDToSlave(param):
     logger.info('prepare send cmd to slave!')
-    cf = GetConf("rbq.conf","main")
-    ipaddr =  cf.get("host")
-    port =  cf.getInt("port")
-    username = cf.get('username')
-    password = ed.decrypt(cf.get('password'))
-    vhost = cf.get('vhost')
+    cf = GetConf("rbq.conf")
+    ipaddr =  cf.getStr("main","host")
+    port =  cf.getInt("main","port")
+    username = cf.getStr("main",'username')
+    password = ed.decrypt(cf.getStr("main",'password'))
+    vhost = cf.getStr("main",'vhost')
 
     mq = RabbitMQPublish(username,password,ipaddr,port,vhost)
     mq.sendMessage(getExchange(),json.dumps(param))

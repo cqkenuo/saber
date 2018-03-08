@@ -21,9 +21,9 @@ class RedisManager(object):
 
 """
 def redis_cli():
-    cf = GetConf("redis.conf","redis")
-    ipaddr =  cf.get("host")
-    port =  cf.getInt("port")
+    cf = GetConf("redis.conf")
+    ipaddr =  cf.getStr("redis","host")
+    port =  cf.getInt("redis","port")
     return redis.Redis(host=ipaddr,port=port,db=0)
 
 if __name__ == '__main__':

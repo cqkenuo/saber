@@ -16,16 +16,21 @@ class SlaveHandle(object):
         self.param_dic = json.loads(param)
         self.param_keys = self.param_dic.keys()
         print (" [x] Received %r" % self.param_dic)
-        self.project_backupPath = str(getHomePath()+'/'+self.param_dic['project_backupPath'])
-        self.project_name = str(self.param_dic['project_name'])
-        self.project_path = str(getHomePath()+'/'+self.param_dic['project_path'])
-        self.project_versionLib = str(getHomePath()+'/'+self.param_dic['project_versionLib'] +'/' +getCurrentDay())
-        self.project_tgzName = str(self.param_dic['project_tgzName'])
-        self.versionLib_path = str(self.param_dic['versionLib_path'] +'/' +getCurrentDay())
-        versionLib_ip = str(self.param_dic['versionLib_ip'])
-        versionLib_sshPort = int(self.param_dic['versionLib_sshPort'])
-        versionLib_hostname = str(self.param_dic['versionLib_hostname'])
-        versionLib_password = str(dc.decrypt(self.param_dic['versionLib_password']))
+        try:
+            self.project_backupPath = str(getHomePath()+'/'+self.param_dic['project_backupPath'])
+            self.project_name = str(self.param_dic['project_name'])
+            self.project_path = str(getHomePath()+'/'+self.param_dic['project_path'])
+            self.project_versionLib = str(getHomePath()+'/'+self.param_dic['project_versionLib'] +'/' +getCurrentDay())
+            self.project_tgzName = str(self.param_dic['project_tgzName'])
+            self.versionLib_path = str(self.param_dic['versionLib_path'] +'/' +getCurrentDay())
+            versionLib_ip = str(self.param_dic['versionLib_ip'])
+            versionLib_sshPort = int(self.param_dic['versionLib_sshPort'])
+            versionLib_hostname = str(self.param_dic['versionLib_hostname'])
+            versionLib_password = str(dc.decrypt(self.param_dic['versionLib_password']))
+        except KeyError:
+            logger.exception("param_dic has not key!please check!!")
+        except Exception:
+            logger.exception("init slave param fail!!!")
         self.transfer = Transfer(versionLib_ip,versionLib_sshPort,versionLib_hostname,versionLib_password)
 
     def handle(self):
@@ -87,7 +92,6 @@ class SlaveHandle(object):
                         logger.info("project path is not null,please empty path!")
                     #配置环境变量,看情况
 
-
                     #启动工程
                     """
                     #!/bin/bash
@@ -95,8 +99,6 @@ class SlaveHandle(object):
                     JAVA=$JAVA_HOME/bin/java
                     nohup $JAVA -jar yunnan-rest-service-0.1.0.jar -Djava.ext.dirs=$JAVA_HOME/lib &
                 """
-
-
 
                     #检查启动情况
 

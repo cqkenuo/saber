@@ -61,12 +61,12 @@ class MysqlBase(object):
 class MysqlHelper(object):
 
     def __init__(self):
-        cf = utils.GetConf("mysql.conf","db")
-        host = cf.get('host')
-        port = cf.getInt('port')
-        username = cf.get('username')
-        password = cf.get('password')
-        dbname = cf.get('dbname')
+        cf = utils.GetConf("mysql.conf")
+        host = cf.getStr('db','host')
+        port = cf.getInt('db','port')
+        username = cf.getStr('db','username')
+        password = cf.getStr('db','password')
+        dbname = cf.getStr('db','dbname')
         self.obj = MysqlBase(host,username,password,dbname,port)
 
 

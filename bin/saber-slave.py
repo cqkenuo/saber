@@ -5,7 +5,7 @@ from utils import redisManager
 from utils import log
 from utils.utils import GetConf
 import socket
-import json,pika
+import pika
 from utils.encrypt import MyCrypt
 from core.slaveHandle import SlaveHandle
 
@@ -20,12 +20,12 @@ class Slave(object):
         redis_cli = redisManager.redis_cli()
         redis_cli.hset("nodes",'nodesHostname',socket.gethostname())
         redis_cli.hset('nodes','nodesIpaddr',socket.gethostbyname(socket.gethostname()))
-        cf = GetConf("rbq.conf","main")
-        self.ipaddr =  cf.get("host")
-        self.port =  cf.getInt("port")
-        self.username = cf.get('username')
-        self.password = ed.decrypt(cf.get('password'))
-        self.vhost = cf.get('vhost')
+        cf = GetConf("rbq.conf")
+        self.ipaddr =  cf.getStr("main","host")
+        self.port =  cf.getInt("main","port")
+        self.username = cf.getStr("main",'username')
+        self.password = ed.decrypt(cf.getStr("main",'password'))
+        self.vhost = cf.getStr("main",'vhost')
 
     def getChannel(self):
         return 'clond'

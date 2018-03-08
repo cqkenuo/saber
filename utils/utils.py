@@ -29,22 +29,47 @@ def isLinux():
 """
 获取配置文件信息
 """
-class GetConf(object):
 
-    def __init__(self,filename,section):
+
+
+#定义MyConf类，重写optionxform方法，来解决值的大小写问题
+class MyConf(ConfigParser.ConfigParser):
+    def __init__(self,defaults=None):
+        ConfigParser.ConfigParser.__init__(self,defaults=None)
+    def optionxform(self, optionstr):
+        return optionstr
+
+
+class GetConf(object):
+    def __init__(self, filename):
         if isLinux():
             confFile = "%s/%s/%s" %(base_dir,conf_path,filename)
         else:
             confFile = "%s\\%s\\%s" %(base_dir,conf_path,filename)
-        self.cf =  ConfigParser.ConfigParser()
+        self.cf=MyConf()
         self.cf.read(confFile)
-        self.section = section
+        self.secDic = {}
 
-    def get(self,option):
-        return self.cf.get(self.section,option)
+    # 这里重写了optionxform方法，直接返回选项名
+    def optionxform(self, optionstr):
+        return optionstr
 
-    def getInt(self,option):
-        return self.cf.getint(self.section,option)
+    def getStr(self,section,option):
+        return self.cf.get(section,option)
+
+    def getInt(self,section,option):
+        return self.cf.getint(section,option)
+
+    #返回一个section内的键值对，以字典格式输出
+    def getOptions(self,section):
+        secs = self.cf.items(section)
+        for sec in secs:
+            self.secDic[sec[0]] = sec[1]
+        return self.secDic
+
+    #获取所有章节名
+    def getSecs(self):
+        return self.cf.sections()
 
 
 
@@ -196,16 +221,17 @@ def isNullDir(work_path):
         return False
 
 if __name__ == '__main__':
-    # #conf配置文件的相关
-    # cf = GetConf("rbq.conf","main")
-    # ipaddr =  cf.get("host")
-    # port =  cf.getInt("port")
-    # username = cf.get('username')
-    # password = cf.get('password')
-    # vhost = cf.get('vhost')
-    #
+    #conf配置文件的相关
+    cf = GetConf("rbq.conf")
+    # ipaddr =  cf.getStr("main","host")
+    # port =  cf.getInt("main","port")
+    # username = cf.getStr("main",'username')
+    # password = cf.getStr("main",'password')
+    # vhost = cf.getStr("main",'vhost')
+
     # mq = RabbitMQPublish(username,ed.decrypt(password),ipaddr,port,vhost)
     # mq.sendMessage('cloud','okokok666')
+    print cf.getOptions('main')
 
     ##测试解压压缩
     # makeTar('/home/ap/ldap/software/git-2.9.5','/home/ap/ldap/tools/backup','git')

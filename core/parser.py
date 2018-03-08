@@ -6,6 +6,7 @@ from optparse import OptionParser
 from warOperate import *
 from utils import redisManager
 from utils import log
+from utils.utils import GetConf
 
 logger = log.Log()
 
@@ -14,16 +15,43 @@ class Saber(object):
 
     def __init__(self):
         self.redis_cli = redisManager.redis_cli()
-        self.project_set = self.redis_cli.smembers('project')
-        self.versionLib_dic = self.redis_cli.hgetall('versionLib')
+        self.project_cf = GetConf("project.conf")
+        self.vesionLib_cf = GetConf("saber.conf")
         self.operParam = {}
+        self.getConfDic()
+
+
+    def getConfDic(self):
+        #先获取redis内的配置文件，如果redis无法获取配置文件，改为本地获取
+        projectParam = self.redis_cli.smembers('project')
+        if projectParam:
+            self.projectParam = list(projectParam)
+        else:
+            self.projectParam = self.project_cf.getSecs()
+
+        versionLibParam = self.redis_cli.hgetall('versionLib')
+        if versionLibParam:
+            self.versionLibParam = self.redis_cli.hgetall('versionLib')
+        else:
+            self.versionLibParam = self.vesionLib_cf.getOptions('versionLib')
+
+
+    #获取工程相关的参数
+    def getProjectItem(self,projectName):
+        if self.redis_cli.hgetall(projectName):
+            return self.redis_cli.hgetall(projectName)
+        else:
+            return  self.project_cf.getOptions(projectName)
+
+
+
 
     def main(self):
         parser = OptionParser(usage="usage: %prog [options] arg1 arg2")
         parser.add_option("-s","--show",type="choice",choices = ['nodes', 'servers'],dest="show_status",help=u"显示server、node等信息")
-        parser.add_option("-b",'--backup',type="choice",choices =list(self.project_set),dest="backup_project",help=u'备份工程')
-        parser.add_option("-u",'--update',type="choice",choices =list(self.project_set),dest="update_project",help=u'更新工程')
-        parser.add_option("-r",'--restore',type="choice",choices =list(self.project_set),dest="restore_project",help=u'回退工程')
+        parser.add_option("-b",'--backup',type="choice",choices =self.projectParam,dest="backup_project",help=u'备份工程')
+        parser.add_option("-u",'--update',type="choice",choices =self.projectParam,dest="update_project",help=u'更新工程')
+        parser.add_option("-r",'--restore',type="choice",choices =self.projectParam,dest="restore_project",help=u'回退工程')
         (options,agrs) = parser.parse_args()
 
         print "options: %s" %options
@@ -63,8 +91,8 @@ class Saber(object):
 
 
         if self.operParam:
-            project_dic = self.redis_cli.hgetall(project_name)
-            nodeParam = dict(self.versionLib_dic, **self.operParam)
-            paramInof = dict(nodeParam, **project_dic)
+            projectItemDic = self.getProjectItem(project_name)
+            nodeParam = dict(self.versionLibParam, **self.operParam)
+            paramInof = dict(nodeParam, **projectItemDic)
             sendCMDToSlave(paramInof)
 
