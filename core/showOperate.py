@@ -22,7 +22,9 @@ class ShowOperate(object):
         for k,v in nodes.items():
             print "%s  %s\n" %(k,v)
 
+
+    @printFormat('servers')
     def servers(self):
-        pass
+        print "功能待开发\n"
 
 

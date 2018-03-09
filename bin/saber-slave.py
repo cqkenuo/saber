@@ -4,8 +4,10 @@ __author__ = 'winkyi@163.com'
 from utils import redisManager
 from utils import log
 from utils.utils import GetConf
+import ConfigParser
 import socket
 import pika
+import sys
 from utils.encrypt import MyCrypt
 from core.slaveHandle import SlaveHandle
 import threading
@@ -18,27 +20,39 @@ class Slave(object):
 
     def __init__(self):
         self.redis_cli = redisManager.redis_cli()
+        self.saberConf = GetConf('saber.conf')
+        self.mqConf = GetConf('rbq.conf')
         self.registerNode()
         self.getMQItem()
 
     #将node注册到redis,定时器，30秒执行一次
     def registerNode(self):
-        logger.info("register node [%s]" %socket.gethostbyname(socket.gethostname()))
-        global timer
-        self.redis_cli.hset("nodes",socket.gethostname(),socket.gethostbyname(socket.gethostname()))
-        #设置key1分钟后失效
-        self.redis_cli.expire('nodes',60)
-        timer = threading.Timer(30,self.registerNode)
-        timer.start()
+        try:
+            heartbeat =  self.saberConf.getInt("node","heartbeat")
+            effect = self.saberConf.getInt("node","effect")
+        except ConfigParser.NoSectionError:
+            logger.exception("configuration file saber.conf section is not found!!")
+            sys.exit("process exit!")
+        else:
+            logger.info("register node [%s]" %socket.gethostbyname(socket.gethostname()))
+            global timer
+            self.redis_cli.hset("nodes",socket.gethostname(),socket.gethostbyname(socket.gethostname()))
+            #设置key1分钟后失效
+            self.redis_cli.expire('nodes',effect)
+            timer = threading.Timer(heartbeat,self.registerNode)
+            timer.start()
 
     #获取消息队列信息
     def getMQItem(self):
-        cf = GetConf("rbq.conf")
-        self.ipaddr =  cf.getStr("main","host")
-        self.port =  cf.getInt("main","port")
-        self.username = cf.getStr("main",'username')
-        self.password = ed.decrypt(cf.getStr("main",'password'))
-        self.vhost = cf.getStr("main",'vhost')
+        try:
+            self.ipaddr =  self.mqConf.getStr("main","host")
+            self.port =  self.mqConf.getInt("main","port")
+            self.username = self.mqConf.getStr("main",'username')
+            self.password = ed.decrypt(self.mqConf.getStr("main",'password'))
+            self.vhost = self.mqConf.getStr("main",'vhost')
+        except ConfigParser.NoSectionError:
+            logger.exception("configuration file rbq.conf section is not found!!")
+            sys.exit("process exit!")
 
     def getChannel(self):
         return 'clond'
