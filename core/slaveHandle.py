@@ -34,7 +34,6 @@ class SlaveHandle(object):
         self.transfer = Transfer(versionLib_ip,versionLib_sshPort,versionLib_hostname,versionLib_password)
 
     def handle(self):
-
         #备份操作
         if 'backup' in self.param_keys:
             print "backup project %s" %self.param_dic['backup']
@@ -81,7 +80,7 @@ class SlaveHandle(object):
                 if fileIsExist("%s/%s.tar.gz"  %(project_backupPath,self.backup_project_name)) and getFileSize("%s/%s.tar.gz"%(project_backupPath,self.backup_project_name))  > 0:
                     #从版本机获取版本至本地版本放置路径
                     logger.info("start get remote verionLib project!")
-                    self.transfer.sftp_down_file('%s/%s' %(self.versionLib_path,self.project_tgzName),'%s/%s' %(self.project_versionLib,self.project_tgzName))
+                    self.transfer.sftp_down_file('%s/%s' %(self.versionLib_path,self.project_tgzName),'%s/%s' %(project_versionLib,self.project_tgzName))
                     logger.info("success get remote versionLib project!")
                     #删除旧版本目录
                     delDir(self.project_path)

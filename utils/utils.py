@@ -220,6 +220,21 @@ def isNullDir(work_path):
     else:
         return False
 
+
+#输出格式自定义，装饰器
+def printFormat(showTpye):
+    def wrapper_(func):
+        def wrapper(*args, **kwargs):
+            print '\033[1;31;40m------------%sitem-----------------\033[0m\n' %showTpye
+            res = func(*args, **kwargs)
+            print '\033[1;31;40m----------------end-------------------\033[0m'
+            return res
+        return wrapper
+    return wrapper_
+
+
+
+
 if __name__ == '__main__':
     #conf配置文件的相关
     cf = GetConf("rbq.conf")

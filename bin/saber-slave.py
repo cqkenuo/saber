@@ -16,10 +16,16 @@ ed = MyCrypt()
 class Slave(object):
 
     def __init__(self):
-        #注册主机信息到redis
+        self.registerNode()
+        self.getMQItem()
+
+    #将node注册到redis
+    def registerNode(self):
         redis_cli = redisManager.redis_cli()
-        redis_cli.hset("nodes",'nodesHostname',socket.gethostname())
-        redis_cli.hset('nodes','nodesIpaddr',socket.gethostbyname(socket.gethostname()))
+        redis_cli.hset("nodes",socket.gethostname(),socket.gethostbyname(socket.gethostname()))
+
+    #获取消息队列信息
+    def getMQItem(self):
         cf = GetConf("rbq.conf")
         self.ipaddr =  cf.getStr("main","host")
         self.port =  cf.getInt("main","port")

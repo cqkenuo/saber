@@ -7,6 +7,7 @@ from warOperate import *
 from utils import redisManager
 from utils import log
 from utils.utils import GetConf
+from core import showOperate
 
 logger = log.Log()
 
@@ -54,12 +55,10 @@ class Saber(object):
         parser.add_option("-r",'--restore',type="choice",choices =self.projectParam,dest="restore_project",help=u'回退工程')
         (options,agrs) = parser.parse_args()
 
-        print "options: %s" %options
-        print "args: %s" %agrs
-
         #如果是show命令
         if options.show_status:
-            print options.show_status
+            so = showOperate.ShowOperate(options.show_status)
+            so.getItem()
 
 
         #判断备份和更新的工程是否一样，强制要求要一样
