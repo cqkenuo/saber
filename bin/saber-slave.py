@@ -101,6 +101,8 @@ class Slave(object):
         logger.info(" [x] Received %r" % body)
 
 if __name__ == '__main__':
-    s = Slave()
-    # s.getMQdata()
-    s.subscribe()
+    try:
+        s = Slave()
+        s.subscribe()
+    except KeyboardInterrupt:
+        sys.exit("user press Ctrl+C exits process")

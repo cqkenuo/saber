@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 __time__ = '2018/3/6 14:29'
 __author__ = 'winkyi@163.com'
-import json
+import json,sys
 from utils.utils import *
 from utils import log
 from backend.transfer import Transfer
@@ -15,7 +15,6 @@ class SlaveHandle(object):
     def __init__(self,param):
         self.param_dic = json.loads(param)
         self.param_keys = self.param_dic.keys()
-        print (" [x] Received %r" % self.param_dic)
         try:
             self.project_backupPath = str(getHomePath()+'/'+self.param_dic['project_backupPath'])
             self.project_name = str(self.param_dic['project_name'])
@@ -29,6 +28,7 @@ class SlaveHandle(object):
             versionLib_password = str(dc.decrypt(self.param_dic['versionLib_password']))
         except KeyError:
             logger.exception("param_dic has not key!please check!!")
+            sys.exit('slave param error,process exit')
         except Exception:
             logger.exception("init slave param fail!!!")
         self.transfer = Transfer(versionLib_ip,versionLib_sshPort,versionLib_hostname,versionLib_password)

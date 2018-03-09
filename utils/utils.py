@@ -50,10 +50,6 @@ class GetConf(object):
         self.cf.read(confFile)
         self.secDic = {}
 
-    # 这里重写了optionxform方法，直接返回选项名
-    def optionxform(self, optionstr):
-        return optionstr
-
     def getStr(self,section,option):
         return self.cf.get(section,option)
 
@@ -225,7 +221,7 @@ def isNullDir(work_path):
 def printFormat(showTpye):
     def wrapper_(func):
         def wrapper(*args, **kwargs):
-            print '\033[1;31;40m------------%sitem-----------------\033[0m\n' %showTpye
+            print '\033[1;31;40m------------%sItem-----------------\033[0m\n' %showTpye
             res = func(*args, **kwargs)
             print '\033[1;31;40m----------------end-------------------\033[0m'
             return res

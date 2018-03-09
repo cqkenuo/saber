@@ -2,8 +2,10 @@
 __time__ = '2018/3/5 17:01'
 __author__ = 'winkyi@163.com'
 
-import paramiko
+import paramiko,sys
+from utils import log
 
+logger = log.Log()
 
 host = "202.5.20.208"
 port = 22
@@ -32,8 +34,8 @@ class Transfer(object):
             for line in std_out:
                 print line.strip("\n")
             ssh_client.close()
-        except Exception, e:
-            print e
+        except Exception:
+            logger.exception("exec_cmd fail please check")
 
 
     #Paramiko上传文件
@@ -44,8 +46,9 @@ class Transfer(object):
             sftp = paramiko.SFTPClient.from_transport(t)
             sftp.put(local_path, server_path)
             t.close()
-        except Exception, e:
-            print e
+        except Exception:
+            logger.exception("upload fail!")
+            sys.exit("upload project fail,process")
 
 
     #Paramiko下载文件
@@ -56,8 +59,10 @@ class Transfer(object):
             sftp = paramiko.SFTPClient.from_transport(t)
             sftp.get(server_path, local_path)
             t.close()
-        except Exception, e:
-            print e
+        except Exception:
+            logger.exception("download fail!")
+            #下载文件失败必须程序要退出，防止下载失败后，又进行后续删除原版本包的操作
+            sys.exit("download project fail,process")
 
 
 if __name__ == '__main__':

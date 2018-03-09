@@ -6,6 +6,7 @@ from utils import log
 from utils.utils import GetConf,RabbitMQPublish
 import json
 from utils.encrypt import MyCrypt
+import ConfigParser,sys
 
 
 ed = MyCrypt()
@@ -21,12 +22,16 @@ def getExchange():
 
 def sendCMDToSlave(param):
     logger.info('prepare send cmd to slave!')
-    cf = GetConf("rbq.conf")
-    ipaddr =  cf.getStr("main","host")
-    port =  cf.getInt("main","port")
-    username = cf.getStr("main",'username')
-    password = ed.decrypt(cf.getStr("main",'password'))
-    vhost = cf.getStr("main",'vhost')
+    try:
+        cf = GetConf("rbq.conf")
+        ipaddr =  cf.getStr("main","host")
+        port =  cf.getInt("main","port")
+        username = cf.getStr("main",'username')
+        password = ed.decrypt(cf.getStr("main",'password'))
+        vhost = cf.getStr("main",'vhost')
+    except ConfigParser.NoSectionError:
+            logger.exception("configuration file saber.conf section is not found!!")
+            sys.exit("process exit!")
 
     mq = RabbitMQPublish(username,password,ipaddr,port,vhost)
     mq.sendMessage(getExchange(),json.dumps(param))
