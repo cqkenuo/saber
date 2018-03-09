@@ -8,6 +8,7 @@ import socket
 import pika
 from utils.encrypt import MyCrypt
 from core.slaveHandle import SlaveHandle
+import threading
 
 
 logger = log.Log()
@@ -16,13 +17,19 @@ ed = MyCrypt()
 class Slave(object):
 
     def __init__(self):
+        self.redis_cli = redisManager.redis_cli()
         self.registerNode()
         self.getMQItem()
 
-    #将node注册到redis
+    #将node注册到redis,定时器，30秒执行一次
     def registerNode(self):
-        redis_cli = redisManager.redis_cli()
-        redis_cli.hset("nodes",socket.gethostname(),socket.gethostbyname(socket.gethostname()))
+        logger.info("register node [%s]" %socket.gethostbyname(socket.gethostname()))
+        global timer
+        self.redis_cli.hset("nodes",socket.gethostname(),socket.gethostbyname(socket.gethostname()))
+        #设置key1分钟后失效
+        self.redis_cli.expire('nodes',60)
+        timer = threading.Timer(30,self.registerNode)
+        timer.start()
 
     #获取消息队列信息
     def getMQItem(self):
