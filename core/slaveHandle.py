@@ -14,41 +14,60 @@ dc = MyCrypt()
 class SlaveHandle(object):
     def __init__(self,param):
         self.param_dic = json.loads(param)
-        self.param_keys = self.param_dic.keys()
         try:
-            self.project_backupPath = str(getHomePath()+'/'+self.param_dic['project_backupPath'])
-            self.project_name = str(self.param_dic['project_name'])
-            self.project_path = str(getHomePath()+'/'+self.param_dic['project_path'])
-            self.project_versionLib = str(getHomePath()+'/'+self.param_dic['project_versionLib'] +'/' +getCurrentDay())
-            self.project_tgzName = str(self.param_dic['project_tgzName'])
-            self.versionLib_path = str(self.param_dic['versionLib_path'] +'/' +getCurrentDay())
-            versionLib_ip = str(self.param_dic['versionLib_ip'])
-            versionLib_sshPort = int(self.param_dic['versionLib_sshPort'])
-            versionLib_hostname = str(self.param_dic['versionLib_hostname'])
-            versionLib_password = str(dc.decrypt(self.param_dic['versionLib_password']))
+            if self.param_dic['operate'] in ['backup','update','restore']:
+                self.getProjectParam()
+            elif self.param_dic['operate'] == 'distribute':
+                self.getFileParam()
         except KeyError:
             logger.exception("param_dic has not key!please check!!")
             sys.exit('slave param error,process exit')
         except Exception:
             logger.exception("init slave param fail!!!")
-        self.transfer = Transfer(versionLib_ip,versionLib_sshPort,versionLib_hostname,versionLib_password)
+        self.getVersionLibParam()
+        self.transfer = Transfer(self.versionLib_ip,self.versionLib_sshPort,self.versionLib_hostname,self.versionLib_password)
+
+    def getProjectParam(self):
+        self.project_backupPath = str(getHomePath()+'/'+self.param_dic['project_backupPath'])
+        self.project_name = str(self.param_dic['project_name'])
+        self.project_path = str(getHomePath()+'/'+self.param_dic['project_path'])
+        self.project_versionLib = str(getHomePath()+'/'+self.param_dic['project_versionLib'] +'/' +getCurrentDay())
+        self.project_tgzName = str(self.param_dic['project_tgzName'])
+        self.versionLib_path = str(self.param_dic['versionLib_path'] +'/' +getCurrentDay())
+
+
+    def getVersionLibParam(self):
+        self.versionLib_ip = str(self.param_dic['versionLib_ip'])
+        self.versionLib_sshPort = int(self.param_dic['versionLib_sshPort'])
+        self.versionLib_hostname = str(self.param_dic['versionLib_hostname'])
+        self.versionLib_password = str(dc.decrypt(self.param_dic['versionLib_password']))
+
+
+    def getFileParam(self):
+        self.remoteFile = self.param_dic['remoteFile']
+        self.soureFile = self.param_dic['soureFile']
 
     def handle(self):
         #备份操作
-        if 'backup' in self.param_keys:
+        if self.param_dic['operate'] == 'backup':
             print "backup project %s" %self.param_dic['backup']
             self.backup(self.project_backupPath,self.project_name,self.project_path)
 
         #更新操作
-        if  'update' in self.param_keys:
+        if  self.param_dic['operate'] == 'update':
             print "update project %s" %self.param_dic['update']
             #更新操作前必须要备份
             self.backup(self.project_backupPath,self.project_name,self.project_path)
             #更新操作
             self.update(self.project_versionLib,self.project_name,self.project_path,self.project_backupPath)
 
-        if  'restore' in self.param_keys:
+        #回退操作
+        if  self.param_dic['operate'] == 'restore':
             print "restore project %s" %self.param_dic['restore']
+
+        #文件分发操作
+        if self.param_dic['operate'] == 'distribute':
+            self.distribute(self.param_dic)
 
 
     def backup(self,project_backupPath,project_name,project_path):
@@ -112,5 +131,21 @@ class SlaveHandle(object):
     def restore(self):
         pass
 
+
+
+
+    def distribute(self,fileParam):
+        soureFile = fileParam['soureFile']
+        remoteFile = fileParam['remoteFile']
+        remotePath = "/".join(remoteFile.split('/')[0:-1])
+        if self.transfer.sftp_exec_command("ls -l %s" %remotePath):
+            if fileIsExist(soureFile):
+                logger.info("start distribute file")
+                self.transfer.sftp_upload_file(remoteFile,soureFile)
+                logger.info("success distribute file %s" %remoteFile)
+            else:
+                logger.error("local file %s is not exist" %soureFile)
+        else:
+            logger.error("remote path %s is not exist!!" %remotePath)
 
 

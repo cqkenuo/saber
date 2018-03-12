@@ -31,9 +31,9 @@ class Transfer(object):
             ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             ssh_client.connect(self.host, self.port, self.user, self.password)
             std_in, std_out, std_err = ssh_client.exec_command(command)
-            for line in std_out:
-                print line.strip("\n")
+            lines = std_out.readlines()
             ssh_client.close()
+            return lines
         except Exception:
             logger.exception("exec_cmd fail please check")
 
@@ -74,7 +74,10 @@ if __name__ == '__main__':
 
     t = Transfer(host,port,user,password)
 
-    t.sftp_exec_command("ls -l")
+    aaa = t.sftp_exec_command("ls -l /root")
+    print aaa
+    for a in aaa:
+        print a,
     # t.sftp_upload_file("/root/tools/test.war", "/home/ap/ldap/software/redis-4.0.8.tar.gz")
     # t.sftp_down_file("/root/tools/aabbccdd.txt", "D:/data/aabbccdd.txt")
 
