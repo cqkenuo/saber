@@ -66,18 +66,18 @@ class Transfer(object):
 
 
 if __name__ == '__main__':
-    host = "202.5.20.208"
+    host = "139.199.163.136"
     port = 22
     timeout = 30
-    user = "root"
-    password = "!@cwq8898859"
+    user = "ldap"
+    password = "xm123456"
 
     t = Transfer(host,port,user,password)
 
-    aaa = t.sftp_exec_command("ls -l /root")
+    aaa = t.sftp_exec_command("ls -l /home/ap/ldap")
     print aaa
     for a in aaa:
         print a,
-    # t.sftp_upload_file("/root/tools/test.war", "/home/ap/ldap/software/redis-4.0.8.tar.gz")
+    t.sftp_upload_file("/home/ap/ldap/abc.txt", "/home/ap/ldap/tools/backup/test/test_20180313163156.tar.gz")
     # t.sftp_down_file("/root/tools/aabbccdd.txt", "D:/data/aabbccdd.txt")
 
